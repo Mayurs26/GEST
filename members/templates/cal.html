@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator Popup</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .popup input {
+            font-size: 1.5rem;
+        }
+
+        .popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.25rem;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+<!-- Button to Open Calculator -->
+<div class="text-center mt-10">
+    <button onclick="openCalculator()" class="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg">
+        Open Calculator
+    </button>
+</div>
+
+<!-- Calculator Popup -->
+<div id="calculatorPopup" class="popup hidden">
+    <span class="close-btn" onclick="closeCalculator()">×</span>
+    <h3 class="text-xl font-bold mb-4 text-center">Calculator</h3>
+    <div class="bg-gray-800 p-4 rounded mb-4">
+        <input type="text" id="calcDisplay" class="w-full bg-transparent text-right text-2xl" readonly>
+    </div>
+    <div class="grid grid-cols-4 gap-2">
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">7</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">8</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">9</button>
+        <button class="calc-btn bg-blue-600 hover:bg-blue-500 p-2 rounded">÷</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">4</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">5</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">6</button>
+        <button class="calc-btn bg-blue-600 hover:bg-blue-500 p-2 rounded">×</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">1</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">2</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">3</button>
+        <button class="calc-btn bg-blue-600 hover:bg-blue-500 p-2 rounded">-</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">0</button>
+        <button class="calc-btn bg-gray-700 hover:bg-gray-600 p-2 rounded">.</button>
+        <button class="calc-btn bg-green-600 hover:bg-green-500 p-2 rounded">=</button>
+        <button class="calc-btn bg-blue-600 hover:bg-blue-500 p-2 rounded">+</button>
+    </div>
+</div>
+
+<script>
+    const calcDisplay = document.getElementById('calcDisplay');
+    const calcButtons = document.querySelectorAll('.calc-btn');
+    const calculatorPopup = document.getElementById('calculatorPopup');
+
+    let currentCalculation = '';
+
+    // Open Calculator Popup
+    function openCalculator() {
+        calculatorPopup.classList.remove('hidden');
+    }
+
+    // Close Calculator Popup
+    function closeCalculator() {
+        calculatorPopup.classList.add('hidden');
+    }
+
+    // Calculator Functionality
+    calcButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const value = button.textContent;
+
+            if (value === '=') {
+                try {
+                    currentCalculation = eval(currentCalculation.replace('×', '*').replace('÷', '/')).toString();
+                } catch (e) {
+                    currentCalculation = 'Error';
+                }
+            } else if (value === 'C') {
+                currentCalculation = '';
+            } else {
+                currentCalculation += value;
+            }
+
+            calcDisplay.value = currentCalculation;
+        });
+    });
+</script>
+
+</body>
+</html>

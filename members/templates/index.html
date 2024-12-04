@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G.E.S.T - Gesture Enabled Smart Technology</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .logo, .title {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .webcam-container {
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+        }
+        .gesture-trail {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-md">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <span class="logo text-2xl font-bold text-blue-600">G.E.S.T</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <a href="cal.html" class="text-white hover:text-blue-600">HOME</a>
+                <a href="#" class="text-white hover:text-blue-600">ABOUT</a>
+                <button onclick="showLoginModal()" class="text-white hover:text-blue-600">LOGIN</button>
+                <div class="text-white"><i class="bi bi-person-circle"></i> USERNAME</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <h1 class="title text-4xl text-center mb-12 text-white">
+            GESTURE <span class="text-blue-600">ENABLED</span> SMART <span class="text-blue-600">TECHNOLOGY</span>
+        </h1>
+                
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Volume Control -->
+            <div class="feature-card rounded-lg p-6 text-center cursor-pointer" onclick="activateFeature('volume')">
+                <i class="bi bi-volume-up text-5xl text-blue-600 mb-4"></i>
+                <h2 class="text-xl font-bold mb-2">VOLUME CONTROL</h2>
+                <p class="text-white">Control system volume with hand gestures</p>
+            </div>
+
+            <!-- Virtual Calculator -->
+            <div class="feature-card rounded-lg p-6 text-center cursor-pointer" onclick="showCalculatorModal();">
+                <i class="bi bi-calculator text-5xl text-blue-600 mb-4"></i>
+                <h2 class="text-xl font-bold mb-2">VIRTUAL CALCULATOR</h2>
+                <p class="text-white">Perform calculations with hand movements</p>
+            </div>
+
+            
+            
+
+            <!-- Virtual Drag and Drop -->
+            <div class="feature-card rounded-lg p-6 text-center cursor-pointer" onclick="activateFeature('dragdrop')">
+                <i class="bi bi-hand-index text-5xl text-blue-600 mb-4"></i>
+                <h2 class="text-xl font-bold mb-2">VIRTUAL DRAG AND DROP</h2>
+                <p class="text-white">Move objects with gesture control</p>
+            </div>
+
+            <!-- Virtual Mouse Control -->
+            <div class="feature-card rounded-lg p-6 text-center cursor-pointer" onclick="activateFeature('mouse')">
+                <i class="bi bi-mouse text-5xl text-blue-600 mb-4"></i>
+                <h2 class="text-xl font-bold mb-2">VIRTUAL MOUSE CONTROL</h2>
+                <p class="text-white">Control cursor with hand movements</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Webcam Container -->
+    <div id="webcamContainer" class="webcam-container fixed inset-0 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-2xl w-full m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="featureTitle">Feature Name</h3>
+                <button onclick="closeWebcam()" class="text-gray-600 hover:text-gray-800">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="relative">
+                <video id="webcam" autoplay playsinline class="w-full rounded-lg"></video>
+                <canvas id="gestureCanvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+            </div>
+        </div>
+    </div>
+
+ <!-- Main Container for Side-by-Side Display -->
+ <div id="virtualCalculatorContainer" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg flex p-6 gap-6 max-w-5xl w-full m-4">
+        <!-- Webcam and Gesture Canvas -->
+        <div class="relative w-1/2">
+            <h3 class="text-xl font-bold mb-4">Gesture Control</h3>
+            <video id="webcam" autoplay playsinline class="w-full rounded-lg"></video>
+            <canvas id="gestureCanvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+        </div>
+        
+        <!-- Calculator -->
+        <div class="bg-gray-100 p-6 rounded-lg w-1/2">
+            <h3 class="text-xl font-bold mb-4">Calculator</h3>
+            <input type="text" id="calc-display" class="w-full text-right p-2 mb-4 border rounded" disabled value="0">
+            <div class="grid grid-cols-4 gap-2">
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('7')">7</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('8')">8</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('9')">9</button>
+                <button class="p-4 bg-blue-500 text-white rounded" onclick="appendCalc('/')">/</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('4')">4</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('5')">5</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('6')">6</button>
+                <button class="p-4 bg-blue-500 text-white rounded" onclick="appendCalc('*')">*</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('1')">1</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('2')">2</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('3')">3</button>
+                <button class="p-4 bg-blue-500 text-white rounded" onclick="appendCalc('-')">-</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('0')">0</button>
+                <button class="p-4 bg-gray-200 rounded" onclick="appendCalc('.')">.</button>
+                <button class="p-4 bg-green-500 text-white rounded" onclick="calculate()">=</button>
+                <button class="p-4 bg-blue-500 text-white rounded" onclick="appendCalc('+')">+</button>
+            </div>
+            <button class="mt-4 bg-gray-800 text-white px-6 py-2 rounded" onclick="closeCalculator()">Close</button>
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full m-4">
+            <h2 class="text-2xl font-bold mb-4">Login</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">Username</label>
+                    <input type="text" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Password</label>
+                    <input type="password" class="w-full p-2 border rounded" required>
+                </div>
+                <div class="flex justify-between">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+                        Login
+                    </button>
+                    <button type="button" onclick="closeLoginModal()" class="text-gray-600 hover:text-gray-800">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+     // Show Calculator Modal
+     function showCalculatorModal() {
+        document.getElementById('virtualCalculatorContainer').classList.remove('hidden');
+        initWebcam(); // Start the webcam for gesture tracking
+    }
+
+    function closeCalculator() {
+        const container = document.getElementById('virtualCalculatorContainer');
+        const video = document.getElementById('webcam');
+        
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+        container.classList.add('hidden');
+    }
+
+    let calcDisplay = '';
+
+function appendCalc(value) {
+    if (calcDisplay === '0') calcDisplay = '';
+    calcDisplay += value;
+    document.getElementById('calc-display').value = calcDisplay;
+}
+
+function calculate() {
+    try {
+        calcDisplay = eval(calcDisplay).toString();
+        document.getElementById('calc-display').value = calcDisplay;
+    } catch (error) {
+        document.getElementById('calc-display').value = 'Error';
+    }
+}
+
+
+
+
+
+        // Feature activation
+        function activateFeature(feature) {
+            const container = document.getElementById('webcamContainer');
+            const title = document.getElementById('featureTitle');
+            container.style.display = 'flex';
+            
+            // Set feature title
+            title.textContent = {
+                'volume': 'Volume Control',
+                'calculator': 'Virtual Calculator',
+                'dragdrop': 'Virtual Drag and Drop',
+                'mouse': 'Virtual Mouse Control'
+            }[feature];
+
+            // Initialize webcam
+            initWebcam();
+        }
+
+        // Webcam initialization
+        async function initWebcam() {
+            try {
+                const video = document.getElementById('webcam');
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (error) {
+                console.error('Error accessing webcam:', error);
+                alert('Unable to access webcam. Please ensure you have granted permission.');
+            }
+        }
+
+        // Close webcam
+        function closeWebcam() {
+            const container = document.getElementById('webcamContainer');
+            const video = document.getElementById('webcam');
+            
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+            
+            container.style.display = 'none';
+        }
+
+        // Login modal functions
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            // Here you would typically handle the login logic
+            closeLoginModal();
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const loginModal = document.getElementById('loginModal');
+            if (event.target === loginModal) {
+                closeLoginModal();
+            }
+        }
+    </script>
+</body>
+</html>
